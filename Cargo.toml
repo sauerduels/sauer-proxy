@@ -1,0 +1,12 @@
+[package]
+name = "sauer-proxy"
+version = "0.2.0"
+authors = ["AngrySnout <splintersal@gmail.com>"]
+
+[dependencies]
+argparse = "0.2.1"
+enet-sys = "0.2.0"
+
+[[bin]]
+name = "sauer-proxy"
+path = "src/main.rs"
