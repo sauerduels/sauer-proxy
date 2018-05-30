@@ -47,8 +47,8 @@ impl ENetClient {
     }
     
     pub fn handle_incoming(&mut self, chan: u8, packet: *mut ENetPacket) {
-        if self.connected {
-            unsafe {
+        unsafe {
+            if self.connected && packet != 0 as *mut ENetPacket && (*packet).data != 0 as *mut u8 {
                 match *(*packet).data {
                     30 => { // N_PING
                         *(*packet).data = 31;
@@ -88,20 +88,22 @@ impl ENetClient {
                         }
                     },
                     _ENetEventType_ENET_EVENT_TYPE_RECEIVE => {
-                        let msg_type = *(*event.packet).data;
-                        let pass_through = msg_type == 1 ||
-                                           msg_type == 2 ||
-                                           msg_type == 35 ||
-                                           msg_type == 36 ||
-                                           msg_type == 37 ||
-                                           msg_type == 25;
-                        let msg = ENetMessage {
-                            time: time.clone(),
-                            chan: event.channelID,
-                            packet: event.packet,
-                            pass_through,
-                        };
-                        self.queue.push_back(msg);
+                        if event.packet != 0 as *mut ENetPacket && (*event.packet).data != 0 as *mut u8 {
+                            let msg_type = *(*event.packet).data;
+                            let pass_through = msg_type == 1 ||
+                                               msg_type == 2 ||
+                                               msg_type == 35 ||
+                                               msg_type == 36 ||
+                                               msg_type == 37 ||
+                                               msg_type == 25;
+                            let msg = ENetMessage {
+                                time: time.clone(),
+                                chan: event.channelID,
+                                packet: event.packet,
+                                pass_through,
+                            };
+                            self.queue.push_back(msg);
+                        }
                     },
                     _ENetEventType_ENET_EVENT_TYPE_DISCONNECT => {
                         enet_peer_disconnect(self.client_peer, event.data);
