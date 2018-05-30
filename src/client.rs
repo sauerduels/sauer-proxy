@@ -29,7 +29,6 @@ impl Client {
         };
         client.socket.connect(remote_addr).unwrap();
         client.socket.set_nonblocking(true).unwrap();
-        println!("Client connected: {}", addr.ip());
         client
     }
     

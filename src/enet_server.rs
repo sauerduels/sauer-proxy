@@ -15,7 +15,7 @@ use enet_client;
 
 pub fn initialize() {
     if unsafe {enet_initialize()} < 0 {
-        panic!("error initializing enet");
+        panic!("Error initializing enet");
     }
 }
 

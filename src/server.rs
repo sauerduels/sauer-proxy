@@ -62,11 +62,7 @@ impl Server {
     
     pub fn clean_up(&mut self, time: SystemTime) {
         self.clients.retain(|_, client| {
-            let timedout = client.check_timeout(time);
-            if timedout {
-                println!("Client disconnected (timeout): {}", client.addr);
-            }
-            !timedout
+            !client.check_timeout(time)
         });
     }
 }
