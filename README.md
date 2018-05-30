@@ -10,11 +10,12 @@ Please note that this program is still **experimental** and **unstable**. Use at
 * Relay all UDP packets at supplied port +1 for extinfo.
 * Optional delay for most packet types in the server->client direction.
 * Master server registration.
+* Player ping reply (pong).
 * Real IP address forwarding (see below).
 
 ## Building
 
-1. Install rust.
+1. Install Rust and Clang.
 2. Run `cargo build` or `cargo build --release`
 3. Start the executable as `./target/debug/sauer-proxy` or `./target/release/sauer-proxy`.
 
