@@ -20,11 +20,12 @@ pub struct ENetClient {
     client_host: *mut ENetHost,
     conn_peer: *mut ENetPeer,
     pub connected: bool,
+    forward_ip: bool,
     queue: VecDeque<ENetMessage>,
 }
 
 impl ENetClient {
-    pub fn new(client_peer: *mut ENetPeer, remote_host: u32, remote_port: u16) -> ENetClient {
+    pub fn new(client_peer: *mut ENetPeer, remote_host: u32, remote_port: u16, forward_ip: bool) -> ENetClient {
         let addr = ENetAddress {
             host: remote_host,
             port: remote_port,
@@ -41,6 +42,7 @@ impl ENetClient {
                 client_host,
                 conn_peer,
                 connected: false,
+                forward_ip,
                 queue: VecDeque::new(),
             }
         }
@@ -77,14 +79,16 @@ impl ENetClient {
                         enet_peer_throttle_configure(self.conn_peer, 5000, 2, 2);
                         enet_host_bandwidth_limit(self.client_host, 0*1024, 0*1024);
                         
-                        let ip = (*self.client_peer).address.host;
-                        // N_SERVMSG setip xxxx
-                        let buf: [u8; 12] = [110, 115, 101, 116, 105, 112, 0, 0x81, ip as u8, (ip>>8) as u8, (ip>>16) as u8, (ip>>24) as u8];
-                        let mut packet = enet_packet_create(buf.as_ptr() as *const c_void, 12, 1);
-                        (*packet).flags = 1;
-                        enet_peer_send(self.conn_peer, 1, packet);
-                        if (*packet).referenceCount==0 {
-                            enet_packet_destroy(packet);
+                        if self.forward_ip {
+                            let ip = (*self.client_peer).address.host;
+                            // N_SERVMSG setip xxxx
+                            let buf: [u8; 12] = [110, 115, 101, 116, 105, 112, 0, 0x81, ip as u8, (ip>>8) as u8, (ip>>16) as u8, (ip>>24) as u8];
+                            let mut packet = enet_packet_create(buf.as_ptr() as *const c_void, 12, 1);
+                            (*packet).flags = 1;
+                            enet_peer_send(self.conn_peer, 1, packet);
+                            if (*packet).referenceCount==0 {
+                                enet_packet_destroy(packet);
+                            }
                         }
                     },
                     _ENetEventType_ENET_EVENT_TYPE_RECEIVE => {

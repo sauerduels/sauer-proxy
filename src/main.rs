@@ -15,6 +15,7 @@ fn main() {
     let mut remote_port = 28785;
     let mut remote_host: String = String::from("");
     let mut register_master = false;
+    let mut forward_ips = false;
     {
         let mut ap = ArgumentParser::new();
         ap.set_description("Sauerbraten proxy server.");
@@ -33,6 +34,9 @@ fn main() {
         ap.refer(&mut register_master)
             .add_option(&["-m", "--register-master"], StoreTrue,
             "register this server with the master server (default: false)");
+        ap.refer(&mut forward_ips)
+            .add_option(&["-f", "--forward-ips"], StoreTrue,
+            "forward real player IP addresses to server (requires compatible server mod, default: false)");
         ap.parse_args_or_exit();
     }
 
@@ -46,7 +50,7 @@ fn main() {
     // let server = server::Server::new(host_addr.as_str(), remote_addr.as_str(), delay);
     
     enet_server::initialize();
-    let server = enet_server::ENetServer::create(port, remote_host.as_str().into(), remote_port, delay);
+    let server = enet_server::ENetServer::create(port, remote_host.as_str().into(), remote_port, delay, forward_ips);
 
     let ext_host_addr = format!("0.0.0.0:{}", port+1);
     let ext_remote_addr = format!("{}:{}", remote_host, remote_port+1);

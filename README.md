@@ -39,6 +39,8 @@ optional arguments:
                         (default: 5000)
   -m,--register-master  register this server with the master server (default:
                         false)
+  -f,--forward-ips      forward real player IP addresses to server (requires
+                        compatible server mod, default: false)
 ```
 
 ## Real IP Address Forwarding

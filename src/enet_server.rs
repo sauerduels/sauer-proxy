@@ -28,6 +28,7 @@ pub struct ENetServer {
     remote_host: u32,
     remote_port: u16,
     delay: u64,
+    forward_ips: bool,
     clients: HashMap<SocketAddr, enet_client::ENetClient>,
 }
 
@@ -36,7 +37,7 @@ fn addr_from_enet_address(address: &ENetAddress) -> SocketAddr {
 }
 
 impl ENetServer {
-    pub fn create(port: u16, remote_host: String, remote_port: u16, delay: u64) -> thread::JoinHandle<()> {
+    pub fn create(port: u16, remote_host: String, remote_port: u16, delay: u64, forward_ips: bool) -> thread::JoinHandle<()> {
         thread::spawn(move || {
             let address = ENetAddress {
                 host: 0,
@@ -59,6 +60,7 @@ impl ENetServer {
                 remote_host: ip_u32,
                 remote_port,
                 delay,
+                forward_ips,
                 clients: HashMap::new(),
             };
             loop {
@@ -87,7 +89,7 @@ impl ENetServer {
                         let addr = addr_from_enet_address(&(*event.peer).address);
                         match self.clients.entry(addr) {
                             Entry::Occupied(o) => o.into_mut(),
-                            Entry::Vacant(v) => v.insert(enet_client::ENetClient::new(event.peer, self.remote_host, self.remote_port))
+                            Entry::Vacant(v) => v.insert(enet_client::ENetClient::new(event.peer, self.remote_host, self.remote_port, self.forward_ips))
                         };
                         println!("Client connected ({})", addr.ip());
                     },
