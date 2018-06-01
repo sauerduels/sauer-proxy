@@ -15,8 +15,6 @@ pub struct Client {
     queue: VecDeque<Message>
 }
 
-static TIMEOUT: Duration = Duration::from_secs(30);
-
 impl Client {
     pub fn new(addr: SocketAddr, remote_addr: &str) -> Client {
         let time = SystemTime::now();
@@ -69,8 +67,9 @@ impl Client {
     }
     
     pub fn check_timeout(&self, time: SystemTime) -> bool {
+        let timeout: Duration = Duration::from_secs(30);
         match time.duration_since(self.last_reply) {
-            Ok(duration) => { duration >= TIMEOUT },
+            Ok(duration) => { duration >= timeout },
             Err(_) => true
         }
     }
