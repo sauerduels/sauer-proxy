@@ -7,40 +7,44 @@ Please note that this program is still **experimental** and **unstable**. Use at
 ## Features
 
 * Relay all ENet packets at supplied port between clients and a remote host.
-* Relay all UDP packets at supplied port +1 for extinfo.
-* Optional delay for most packet types in the server->client direction.
+* Extinfo relay at port +1 with caching.
+* Optional delay for packets in the server->client direction.
 * Master server registration.
 * Player ping reply (pong).
 * Real IP address forwarding (see below).
 
 ## Building
 
-1. Install Rust and Clang.
-2. Run `cargo build` or `cargo build --release`
-3. Start the executable as `./target/debug/sauer-proxy` or `./target/release/sauer-proxy`.
+You will need CMake and GCC.
+
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+```
 
 ## Usage
 
 ```
 Usage:
-    ./sauer-proxy [OPTIONS] [REMOTE_HOST]
+    ./SauerProxy [options] remote_host
 
 Sauerbraten proxy server.
 
-positional arguments:
-  remote_host           IP address of remote server
+Positional arguments:
+  remote_host   IP address of remote server
 
-optional arguments:
-  -h,--help             show this help message and exit
-  -p,--port PORT        port on which to listen (default: 28785)
-  -r,--remote-port REMOTE_PORT
-                        port of remote server (default: 28785)
-  -d,--delay DELAY      delay server->client packets by this many milliseconds
-                        (default: 5000)
-  -m,--register-master  register this server with the master server (default:
-                        false)
-  -f,--forward-ips      forward real player IP addresses to server (requires
-                        compatible server mod, default: false)
+Optional arguments:
+  -h        Show this help message and exit
+  -p        Port on which to listen (default: 28785)
+  -r        Port of remote server (default: 28785)
+  -d        Delay server->client packets by this many milliseconds (default: 0)
+  -o        Add this many milliseconds to the pings of all connected players
+            (default: 0)
+  -m        Register this server with the master server (default: false)
+  -f        Forward real player IP addresses to server (requires compatible
+            server mod, default: false)
 ```
 
 ## Real IP Address Forwarding
