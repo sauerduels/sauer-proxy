@@ -9,6 +9,57 @@ using std::endl;
 #define N_CLIENTPING (32)
 #define N_SERVCMD (110)
 
+int get_int(unsigned char *buf, int len, int *advance = NULL)
+{
+    if (advance) *advance = 0;
+    if (len < 1) return 0;
+
+    if (advance) *advance = 1;
+    int c = (char)buf[0];
+    if (c == -128 && len >= 3)
+    {
+        if (advance) *advance = 3;
+        int n = buf[1];
+        n |= buf[2]<<8;
+        return n;
+    }
+    else if (c == -127 && len >= 5)
+    {
+        if (advance) *advance = 5;
+        int n = buf[1];
+        n |= buf[2]<<8;
+        n |= buf[3]<<16;
+        return n|(buf[4]<<24);
+    }
+    else return c;
+}
+
+int put_int(int n, unsigned char *buf, int len)
+{
+    if (n < 128 && n > -127 && len >= 1)
+    {
+        buf[0] = n;
+        return 1;
+    }
+    else if (n < 0x8000 && n >= -0x8000 && len >= 3)
+    {
+        buf[0] = 0x80;
+        buf[1] = n&0xFF;
+        buf[2] = (n>>8)&0xFF;
+        return 3;
+    }
+    else if (len >= 5)
+    {
+        buf[0] = 0x81;
+        buf[1] = n&0xFF;
+        buf[2] = (n>>8)&0xFF;
+        buf[3] = (n>>16)&0xFF;
+        buf[4] = (n>>24)&0xFF;
+        return 5;
+    }
+    return 0;
+}
+
 Client::Client(ENetPeer *client_peer, unsigned int remote_host, unsigned short remote_port, int delay, int ping_offset, bool forward_ip):
     client_peer(client_peer), forward_ip(forward_ip), connected(false), disconnecting(false), delay(delay), ping_offset(ping_offset)
 {
@@ -38,11 +89,28 @@ void Client::c2s(unsigned char chan, ENetPacket *packet)
         switch (packet->data[0])
         {
             case N_PING:
-                packet->data[0] = 31;
+            {
+                if (ping_offset != 0)
+                {
+                    int time = get_int(&packet->data[1], packet->dataLength-1);
+
+                    unsigned char data[10];
+                    data[0] = 31;
+                    int len = 1 + put_int(time-ping_offset, &data[1], 9);
+                    packet = enet_packet_create(data, len, 1);
+                    packet->flags |= ENET_PACKET_FLAG_RELIABLE;
+                }
+
                 enet_peer_send(client_peer, chan, packet);
+
+                if (ping_offset != 0)
+                {
+                    if (packet->referenceCount == 0)
+                        enet_packet_destroy(packet);
+                }
                 break;
+            }
             case N_CLIENTPING:
-                // TODO: add ping_offset
                 enet_peer_send(server_peer, chan, packet);
                 break;
             case N_SERVCMD:
@@ -167,6 +235,6 @@ int Client::slice(unsigned long long millis)
 void Client::disconnect(int reason)
 {
     enet_peer_disconnect(server_peer, reason);
-    server_peer = 0;
+    server_peer = NULL;
     disconnecting = true;
 }
