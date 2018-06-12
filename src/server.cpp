@@ -80,7 +80,10 @@ void Server::slice(unsigned long long millis)
     for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end();)
     {
         if ((*it)->slice(millis))
+        {
+            delete *it;
             it = clients.erase(it);
+        }
         else
             it++;
     }
