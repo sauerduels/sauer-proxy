@@ -85,7 +85,6 @@ int parse_args(int argc, char *argv[])
         cout<<"Error: remote_host argument required"<<endl;
         return -1;
     }
-    cout<<port<<" "<<remote_port<<" "<<delay<<" "<<ping_offset<<" "<<register_master<<" "<<forward_ips<<endl;
     return 0;
 }
 
