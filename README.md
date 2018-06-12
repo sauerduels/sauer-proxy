@@ -15,7 +15,7 @@ Please note that this program is still **experimental** and **unstable**. Use at
 
 ## Building
 
-You will need CMake and GCC.
+You will need CMake, a C compiler, and a C++ compiler.
 
 ```
 $ mkdir build
