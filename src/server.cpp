@@ -149,10 +149,7 @@ void Server::update_master(unsigned long long millis)
     }
 
     if (sent > 0)
-    {
-//        cout<<"Master server registration request sent"<<endl;
         last_successful_master_update = millis;
-    }
 }
 
 void Server::process_master_input()
