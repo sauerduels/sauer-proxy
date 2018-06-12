@@ -36,6 +36,8 @@ ExtInfoServer::ExtInfoServer(unsigned short port, unsigned int remote_host, unsi
         response_bufs[i].data = new unsigned char[4096];
         response_bufs[i].dataLength = 4096;
     }
+
+    cout<<"Extinfo server socket listening on port "<<port<<endl;
 }
 
 ExtInfoServer::~ExtInfoServer()
