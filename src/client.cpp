@@ -90,6 +90,7 @@ void Client::c2s(unsigned char chan, ENetPacket *packet)
         {
             case N_PING:
             {
+                packet->data[0] = 31;
                 if (ping_offset != 0)
                 {
                     int time = get_int(&packet->data[1], packet->dataLength-1);
