@@ -69,15 +69,24 @@ Client::Client(ENetPeer *client_peer, unsigned int remote_host, unsigned short r
 
     ENetAddress address{remote_host, remote_port};
     server_peer = enet_host_connect(client_host, &address, 3, 0);
+    if (!server_peer)
+        throw "Coult not create server peer";
+
     enet_host_flush(client_host);
 }
 
 Client::~Client()
 {
     if (client_peer)
+    {
         enet_peer_disconnect(client_peer, 0);
+        client_peer = NULL;
+    }
     if (server_peer)
+    {
         enet_peer_disconnect(server_peer, 0);
+        server_peer = NULL;
+    }
     enet_host_flush(client_host);
     enet_host_destroy(client_host);
 }
@@ -223,7 +232,6 @@ int Client::slice(unsigned long long millis)
                 connected = false;
                 disconnecting = true;
                 return -1;
-                break;
             }
             default:
                 break;
