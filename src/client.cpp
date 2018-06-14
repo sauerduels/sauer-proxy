@@ -77,11 +77,6 @@ Client::Client(ENetPeer *client_peer, unsigned int remote_host, unsigned short r
 
 Client::~Client()
 {
-    if (client_peer)
-    {
-        enet_peer_disconnect(client_peer, 0);
-        client_peer = NULL;
-    }
     if (server_peer)
     {
         enet_peer_disconnect(server_peer, 0);
@@ -227,8 +222,6 @@ int Client::slice(unsigned long long millis)
             }
             case ENET_EVENT_TYPE_DISCONNECT:
             {
-                enet_peer_disconnect(client_peer, event.data);
-                client_peer = NULL;
                 connected = false;
                 disconnecting = true;
                 return -1;
