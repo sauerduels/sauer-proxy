@@ -235,7 +235,10 @@ int Client::slice(unsigned long long millis)
 
 void Client::disconnect(int reason)
 {
-    enet_peer_disconnect(server_peer, reason);
-    server_peer = NULL;
+    if (server_peer)
+    {
+        enet_peer_disconnect(server_peer, reason);
+        server_peer = NULL;
+    }
     disconnecting = true;
 }
