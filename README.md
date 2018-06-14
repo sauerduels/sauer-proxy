@@ -7,7 +7,7 @@ Please note that this program is still **experimental** and **unstable**. Use at
 ## Features
 
 * Relay all ENet packets at supplied port between clients and a remote host.
-* Extinfo relay at port +1 with caching.
+* Extinfo relay at port +1.
 * Optional delay for packets in the server->client direction.
 * Master server registration.
 * Player ping reply (pong).
