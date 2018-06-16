@@ -161,17 +161,15 @@ void Client::process_queue(unsigned long long millis)
 
     while (1)
     {
+        cout<<"Loop: Client::process_queue"<<endl;
         if (queue.size() == 0)
             break;
 
         Message &message = queue.front();
-        if (message.millis <= until || message.pass_through)
-        {
-            enet_peer_send(client_peer, message.chan, message.packet);
-            queue.pop();
-        }
-        else
-            break;
+        if (message.millis > until && !message.pass_through) break;
+
+        enet_peer_send(client_peer, message.chan, message.packet);
+        queue.pop();
     }
 }
 
@@ -203,6 +201,7 @@ int Client::slice(unsigned long long millis)
     ENetEvent event;
     while (enet_host_service(client_host, &event, 0) > 0)
     {
+        cout<<"Loop: Client::slice"<<endl;
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:

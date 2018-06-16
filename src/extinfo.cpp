@@ -55,6 +55,8 @@ void ExtInfoServer::process_clients(unsigned long long millis)
 
     for (std::map<ENetAddress, ExtInfoClient, ENetAddressCompare>::iterator it = clients.begin(); it != clients.end(); it++)
     {
+        cout<<"Loop: ExtInfoServer::process_clients"<<endl;
+
         ExtInfoClient &client = it->second;
         int len = enet_socket_receive(client.server_socket, NULL, &buf, 1);
         if (len > 0)

@@ -37,6 +37,8 @@ void Server::slice(unsigned long long millis)
 
     while (!serviced)
     {
+        cout<<"Loop: Server::slice while"<<endl;
+
         if (enet_host_check_events(server_host, &event) <= 0)
         {
             if (enet_host_service(server_host, &event, 5) <= 0)
@@ -86,6 +88,8 @@ void Server::slice(unsigned long long millis)
     }
     for (std::vector<Client *>::iterator it = clients.begin(); it != clients.end();)
     {
+        cout<<"Loop: Server::slice for"<<endl;
+
         if ((*it)->slice(millis))
         {
             delete *it;
