@@ -59,6 +59,7 @@ void ExtInfoServer::process_clients(unsigned long long millis)
         int len = enet_socket_receive(client.server_socket, NULL, &buf, 1);
         if (len > 0)
         {
+            buf.dataLength = len;
             enet_socket_send(pong_socket, &it->first, &buf, 1);
             client.update_millis = millis;
         }
