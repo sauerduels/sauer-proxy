@@ -52,10 +52,6 @@ impl ENetClient {
         unsafe {
             if self.connected && packet != 0 as *mut ENetPacket && (*packet).data != 0 as *mut u8 {
                 match *(*packet).data {
-                    30 => { // N_PING
-                        *(*packet).data = 31;
-                        enet_peer_send(self.client_peer, chan, packet);
-                    },
                     110 => {}, // N_SERVCMD
                     _ => { enet_peer_send(self.conn_peer, chan, packet); }
                 }
