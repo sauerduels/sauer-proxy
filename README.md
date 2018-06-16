@@ -10,7 +10,6 @@ Please note that this program is still **experimental** and **unstable**. Use at
 * Relay all UDP packets at supplied port +1 for extinfo.
 * Optional delay for most packet types in the server->client direction.
 * Master server registration.
-* Player ping reply (pong).
 * Real IP address forwarding (see below).
 
 ## Building
