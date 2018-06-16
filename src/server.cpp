@@ -187,7 +187,5 @@ void Server::process_master_input()
            cout<<"Error: Master server registration failed: "<<response<<endl;
        else if (!strncmp(response, "succreg", 7))
            cout<<"Master server registration succeeded"<<endl;
-       else
-           cout<<"Unknown master server message received: "<<response<<endl;
    }
 }
