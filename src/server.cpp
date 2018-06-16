@@ -51,8 +51,8 @@ void Server::slice(unsigned long long millis)
                 Client *client = new Client(event.peer, remote_host, remote_port, delay, ping_offset, forward_ips);
                 clients.push_back(client);
 
-                if (event.peer->data)
-                    ((Client *)event.peer->data)->disconnect(0);
+                //if (event.peer->data)
+                //    ((Client *)event.peer->data)->disconnect(0);
                 event.peer->data = client;
 
                 int res = enet_address_get_host_ip(&event.peer->address, hn, sizeof(hn));
