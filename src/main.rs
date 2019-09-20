@@ -44,10 +44,6 @@ fn main() {
         println!("Error: remote_host argument is required");
         return;
     }
-
-    // let host_addr = format!("0.0.0.0:{}", port);
-    // let remote_addr = format!("{}:{}", remote_host, remote_port);
-    // let server = server::Server::new(host_addr.as_str(), remote_addr.as_str(), delay);
     
     enet_server::initialize();
     let server = enet_server::ENetServer::create(port, remote_host.as_str().into(), remote_port, delay, forward_ips);
