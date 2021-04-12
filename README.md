@@ -14,7 +14,7 @@ Please note that this program is still **experimental** and **unstable**. Use at
 
 ## Building
 
-1. Install Rust and Clang.
+1. Install Rust, Clang and CMake (see [enet build requirements](https://crates.io/crates/enet-sys)).
 2. Run `cargo build` or `cargo build --release`
 3. Start the executable as `./target/debug/sauer-proxy` or `./target/release/sauer-proxy`.
 
@@ -53,3 +53,8 @@ addtrustedhost x.x.x.x
 ```
 
 Where `x.x.x.x` is the IP address of the proxy server.
+
+## Usage via Docker
+
+1. Build via `docker build -t sauer-proxy .`
+2. Run via `docker run -it --rm --network host sauer-proxy` (ammend the CLI arguments you need)

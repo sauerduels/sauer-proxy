@@ -7,7 +7,7 @@ use std::time::Duration;
 pub fn register_master(port: u16) {
     thread::spawn(move || {
         loop {
-            match TcpStream::connect("37.59.116.203:28787") {
+            match TcpStream::connect("95.217.181.72:28787") {
                 Ok(mut stream) => {
                     let _ = stream.write(format!("regserv {}\n", port).as_bytes());
                     let mut res = [0; 128];
