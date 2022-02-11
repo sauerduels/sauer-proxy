@@ -31,7 +31,7 @@ impl Client {
     }
     
     pub fn handle_incoming(&self, buf: &mut [u8], len: usize) {
-        self.socket.send(&buf[0..len]).is_ok();
+        self.socket.send(&buf[0..len]).unwrap();
     }
     
     pub fn slice(&mut self, buf: &mut [u8], time: SystemTime, delay: u64, grace: u64) -> Option<usize> {

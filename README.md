@@ -31,7 +31,8 @@ positional arguments:
 
 optional arguments:
   -h,--help             show this help message and exit
-  -p,--port PORT        port on which to listen (default: 28785)
+  -l,--listen-port LISTEN_PORT
+                        port on which to listen (default: 28785)
   -r,--remote-port REMOTE_PORT
                         port of remote server (default: 28785)
   -d,--delay DELAY      delay server->client packets by this many milliseconds
@@ -44,12 +45,6 @@ optional arguments:
 
 ## Real IP Address Forwarding
 
-To enable this feature, you must use a compatible Sauerbraten server such as the [Sauerduels Sauerbraten Server](https://github.com/sauerduels/sauer-server). This allows display of a player's real country name instead of the proxy's, and prevents banning the proxy server.
+To enable this feature, you must use a compatible Sauerbraten server such as [p1xbraten](https://github.com/sauerbraten/p1xbraten). This allows display of a player's real country name instead of the proxy's, and prevents banning the proxy server.
 
-In the server's configuration file (*server-init.cfg*), for every unique proxy server host you wish to use, add the following line:
-
-```
-addtrustedhost x.x.x.x
-```
-
-Where `x.x.x.x` is the IP address of the proxy server.
+See https://github.com/sauerbraten/p1xbraten#proxy_setippatch for information on how to use it.
