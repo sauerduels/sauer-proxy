@@ -5,7 +5,7 @@ authors = ["AngrySnout <splintersal@gmail.com>"]
 
 [dependencies]
 argparse = "0.2.1"
-enet-sys = "0.2.0"
+enet-sys = "0.2.3"
 
 [[bin]]
 name = "sauer-proxy"

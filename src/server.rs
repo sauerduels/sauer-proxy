@@ -52,7 +52,7 @@ impl Server {
         for (_, client) in &mut self.clients {
             match client.slice(buf, time, self.delay, self.grace) {
                 Some(len) => {
-                    self.socket.send_to(&buf[0..len], client.addr).is_ok();
+                    self.socket.send_to(&buf[0..len], client.addr).unwrap();
                 },
                 None => {}
             };
