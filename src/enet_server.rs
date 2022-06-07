@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime};
 use std::thread;
 use std::collections::{HashMap};
 use std::collections::hash_map::Entry;
-use std::net::{SocketAddr, IpAddr, Ipv4Addr};
+use std::net::{SocketAddrV4,  Ipv4Addr};
 
 use enet_client;
 
@@ -25,23 +25,26 @@ pub fn deinitialize() {
 
 pub struct ENetServer {
     server_host: *mut ENetHost,
-    remote_host: u32,
+    remote_host: u32, // in network byte order, ready for ENet
     remote_port: u16,
     delay: u64,
     forward_ips: bool,
-    clients: HashMap<SocketAddr, enet_client::ENetClient>,
+    clients: HashMap<SocketAddrV4, enet_client::ENetClient>,
 }
 
-fn addr_from_enet_address(address: &ENetAddress) -> SocketAddr {
-    SocketAddr::new(IpAddr::from(Ipv4Addr::from(address.host)), address.port)
+fn to_network_order(ip: u32) -> u32 { ip.to_be() }
+fn from_network_order(ip: u32) -> u32 { u32::from_be(ip) }
+
+fn to_socket_addr(address: &ENetAddress) -> SocketAddrV4 {
+    SocketAddrV4::new(Ipv4Addr::from(from_network_order(address.host)), address.port)
 }
 
 impl ENetServer {
-    pub fn create(port: u16, remote_host: String, remote_port: u16, delay: u64, forward_ips: bool) -> thread::JoinHandle<()> {
+    pub fn create(listen_port: u16, remote_host: String, remote_port: u16, delay: u64, forward_ips: bool) -> thread::JoinHandle<()> {
         thread::spawn(move || {
             let address = ENetAddress {
                 host: 0,
-                port: port
+                port: listen_port
             };
             let server_host: *mut ENetHost;
             unsafe {
@@ -49,15 +52,13 @@ impl ENetServer {
                 if server_host.is_null() {
                     panic!("Could not create server host")
                 }
-                println!("Server host listening on port {}", port);
+                println!("Server host listening on port {}", listen_port);
                 (*server_host).duplicatePeers = 128;
             }
-            let ip_addr: Ipv4Addr = remote_host.parse().unwrap();
-            let ip_octets = ip_addr.octets();
-            let ip_u32: u32 = ((ip_octets[3] as u32)<<24) + ((ip_octets[2] as u32)<<16) + ((ip_octets[1] as u32)<<8) + (ip_octets[0] as u32);
+            let remote_ip: Ipv4Addr = remote_host.parse().unwrap();
             let mut server = ENetServer {
                 server_host,
-                remote_host: ip_u32,
+                remote_host: to_network_order(u32::from(remote_ip)),
                 remote_port,
                 delay,
                 forward_ips,
@@ -86,7 +87,7 @@ impl ENetServer {
                 }
                 match event.type_ {
                     _ENetEventType_ENET_EVENT_TYPE_CONNECT => {
-                        let addr = addr_from_enet_address(&(*event.peer).address);
+                        let addr = to_socket_addr(&(*event.peer).address);
                         match self.clients.entry(addr) {
                             Entry::Occupied(o) => o.into_mut(),
                             Entry::Vacant(v) => v.insert(enet_client::ENetClient::new(event.peer, self.remote_host, self.remote_port, self.forward_ips))
@@ -94,7 +95,7 @@ impl ENetServer {
                         println!("Client connected ({})", addr.ip());
                     },
                     _ENetEventType_ENET_EVENT_TYPE_RECEIVE => {
-                        let addr = addr_from_enet_address(&(*event.peer).address);
+                        let addr = to_socket_addr(&(*event.peer).address);
                         match self.clients.get_mut(&addr) {
                             Some(client) => {
                                 client.handle_incoming(event.channelID, event.packet);
@@ -106,7 +107,7 @@ impl ENetServer {
                         }
                     },
                     _ENetEventType_ENET_EVENT_TYPE_DISCONNECT => {
-                        let addr = addr_from_enet_address(&(*event.peer).address);
+                        let addr = to_socket_addr(&(*event.peer).address);
                         match self.clients.get_mut(&addr) {
                             Some(client) => {
                                 client.disconnect();

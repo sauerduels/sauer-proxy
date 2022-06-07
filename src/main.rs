@@ -10,7 +10,7 @@ mod enet_server;
 mod enet_client;
 
 fn main() {
-    let mut port = 28785;
+    let mut listen_port = 28785;
     let mut delay = 5000;
     let mut remote_port = 28785;
     let mut remote_host: String = String::from("");
@@ -19,8 +19,8 @@ fn main() {
     {
         let mut ap = ArgumentParser::new();
         ap.set_description("Sauerbraten proxy server.");
-        ap.refer(&mut port)
-            .add_option(&["-p", "--port"], Store,
+        ap.refer(&mut listen_port)
+            .add_option(&["-l", "--listen-port"], Store,
             "port on which to listen (default: 28785)");
         ap.refer(&mut remote_port)
             .add_option(&["-r", "--remote-port"], Store,
@@ -46,14 +46,14 @@ fn main() {
     }
     
     enet_server::initialize();
-    let server = enet_server::ENetServer::create(port, remote_host.as_str().into(), remote_port, delay, forward_ips);
+    let server = enet_server::ENetServer::create(listen_port, remote_host.as_str().into(), remote_port, delay, forward_ips);
 
-    let ext_host_addr = format!("0.0.0.0:{}", port+1);
+    let ext_host_addr = format!("0.0.0.0:{}", listen_port+1);
     let ext_remote_addr = format!("{}:{}", remote_host, remote_port+1);
     let ext_server = server::Server::new(ext_host_addr.as_str(), ext_remote_addr.as_str(), 0, 0);
 
     if register_master {
-        master::register_master(port);
+        master::register_master(listen_port);
     }
 
     server.join().unwrap();

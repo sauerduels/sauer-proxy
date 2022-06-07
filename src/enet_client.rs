@@ -8,6 +8,15 @@ use std::collections::{VecDeque};
 use std::time::{Duration, SystemTime};
 use std::os::raw::c_void;
 
+const N_SERVINFO:  u8 = 1;
+const N_WELCOME:   u8 = 2;
+const N_ITEMSPAWN: u8 = 25;
+const N_SERVMSG:   u8 = 35;
+const N_ITEMLIST:  u8 = 36;
+const N_RESUME:    u8 = 37;
+const N_SERVCMD:   u8 = 113;
+const N_P1X_SETIP: u16 = 900;
+
 struct ENetMessage {
     time: SystemTime,
     chan: u8,
@@ -52,7 +61,7 @@ impl ENetClient {
         unsafe {
             if self.connected && packet != 0 as *mut ENetPacket && (*packet).data != 0 as *mut u8 {
                 match *(*packet).data {
-                    110 => {}, // N_SERVCMD
+                    N_SERVCMD => {},
                     _ => { enet_peer_send(self.conn_peer, chan, packet); }
                 }
             }
@@ -76,10 +85,11 @@ impl ENetClient {
                         enet_host_bandwidth_limit(self.client_host, 0*1024, 0*1024);
                         
                         if self.forward_ip {
-                            let ip = (*self.client_peer).address.host;
-                            // N_SERVMSG setip xxxx
-                            let buf: [u8; 12] = [110, 115, 101, 116, 105, 112, 0, 0x81, ip as u8, (ip>>8) as u8, (ip>>16) as u8, (ip>>24) as u8];
-                            let mut packet = enet_packet_create(buf.as_ptr() as *const c_void, 12, 1);
+                            let mut ip = (*self.client_peer).address.host;
+                            ip = ip + 1;
+                            // N_P1X_SETIP ip (= 2 x putint())
+                            let buf: [u8; 8] = [0x80, N_P1X_SETIP as u8, (N_P1X_SETIP>>8) as u8, 0x81, ip as u8, (ip>>8) as u8, (ip>>16) as u8, (ip>>24) as u8];
+                            let mut packet = enet_packet_create(buf.as_ptr() as *const c_void, buf.len(), 1);
                             (*packet).flags = 1;
                             enet_peer_send(self.conn_peer, 1, packet);
                             if (*packet).referenceCount==0 {
@@ -90,12 +100,12 @@ impl ENetClient {
                     _ENetEventType_ENET_EVENT_TYPE_RECEIVE => {
                         if event.packet != 0 as *mut ENetPacket && (*event.packet).data != 0 as *mut u8 {
                             let msg_type = *(*event.packet).data;
-                            let pass_through = msg_type == 1 ||
-                                               msg_type == 2 ||
-                                               msg_type == 35 ||
-                                               msg_type == 36 ||
-                                               msg_type == 37 ||
-                                               msg_type == 25;
+                            let pass_through = msg_type == N_SERVINFO  ||
+                                               msg_type == N_WELCOME   ||
+                                               msg_type == N_ITEMSPAWN ||
+                                               msg_type == N_SERVMSG   ||
+                                               msg_type == N_ITEMLIST  ||
+                                               msg_type == N_RESUME;
                             let msg = ENetMessage {
                                 time: time.clone(),
                                 chan: event.channelID,
