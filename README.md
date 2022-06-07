@@ -14,7 +14,7 @@ Please note that this program is still **experimental** and **unstable**. Use at
 
 ## Building
 
-1. Install Rust and Clang.
+1. Install Rust, Clang, and CMake (see [enet build requirements](https://crates.io/crates/enet-sys)).
 2. Run `cargo build` or `cargo build --release`
 3. Start the executable as `./target/debug/sauer-proxy` or `./target/release/sauer-proxy`.
 
@@ -42,6 +42,11 @@ optional arguments:
   -f,--forward-ips      forward real player IP addresses to server (requires
                         compatible server mod, default: false)
 ```
+
+## Usage via Docker
+
+1. Build using `docker build -t sauer-proxy .`
+2. Run using `docker run -it --rm --network host sauer-proxy` (amend the CLI arguments you need)
 
 ## Real IP Address Forwarding
 
